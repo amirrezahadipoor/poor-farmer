@@ -225,6 +225,7 @@ public final class SceneRenderer implements AutoCloseable {
   private Mesh buildings;
   private Mesh village;
   private Mesh town;
+  private Mesh tehran;
   private GrandfatherHouse house;
   private Mesh houseMesh;
   private Mesh houseInteriorMesh;
@@ -318,6 +319,13 @@ public final class SceneRenderer implements AutoCloseable {
     town = Mesh.upload(geometry);
   }
 
+  public void setTehran(MeshGeometry geometry) {
+    if (tehran != null) {
+      tehran.close();
+    }
+    tehran = Mesh.upload(geometry);
+  }
+
   public void setTerrain(MeshGeometry geometry) {
     if (terrain != null) {
       terrain.close();
@@ -375,6 +383,9 @@ public final class SceneRenderer implements AutoCloseable {
     }
     if (town != null) {
       town.draw();
+    }
+    if (tehran != null) {
+      tehran.draw();
     }
     if (houseInteriorMesh != null && houseInterior) {
       houseInteriorMesh.draw();
@@ -538,6 +549,10 @@ public final class SceneRenderer implements AutoCloseable {
     if (town != null) {
       town.close();
       town = null;
+    }
+    if (tehran != null) {
+      tehran.close();
+      tehran = null;
     }
     if (houseMesh != null) {
       houseMesh.close();

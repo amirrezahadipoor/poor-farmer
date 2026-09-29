@@ -5,7 +5,7 @@ public enum WorldLocation {
   FARM(0f, 0f, "مزرعه"),
   VILLAGE(60f, 15f, "روستا"),
   TOWN(-70f, 14f, "شهر"),
-  TEHRAN(0f, 0f, "تهران");
+  TEHRAN(71f, -78f, "تهران");
 
   private final float focusX;
   private final float focusZ;
