@@ -151,6 +151,7 @@ public final class GameActivity extends Activity {
       scene.setRiver(assets.riverMesh);
       scene.setMountains(assets.mountainMesh);
       scene.setCloudLayer(assets.cloudMesh);
+      scene.setHouse(game.house());
     });
   }
 }

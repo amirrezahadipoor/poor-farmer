@@ -58,6 +58,42 @@ public final class MeshGeometry {
     return this;
   }
 
+  public MeshGeometry rotateZ(float radians) {
+    float c = (float) Math.cos(radians);
+    float s = (float) Math.sin(radians);
+    for (int i = 0; i < usedVertexCount * 3; i += 3) {
+      float x = positions[i];
+      float y = positions[i + 1];
+      positions[i] = x * c - y * s;
+      positions[i + 1] = x * s + y * c;
+    }
+    for (int i = 0; i < usedVertexCount * 3; i += 3) {
+      float nx = normals[i];
+      float ny = normals[i + 1];
+      normals[i] = nx * c - ny * s;
+      normals[i + 1] = nx * s + ny * c;
+    }
+    return this;
+  }
+
+  public MeshGeometry rotateX(float radians) {
+    float c = (float) Math.cos(radians);
+    float s = (float) Math.sin(radians);
+    for (int i = 0; i < usedVertexCount * 3; i += 3) {
+      float y = positions[i + 1];
+      float z = positions[i + 2];
+      positions[i + 1] = y * c - z * s;
+      positions[i + 2] = y * s + z * c;
+    }
+    for (int i = 0; i < usedVertexCount * 3; i += 3) {
+      float ny = normals[i + 1];
+      float nz = normals[i + 2];
+      normals[i + 1] = ny * c - nz * s;
+      normals[i + 2] = ny * s + nz * c;
+    }
+    return this;
+  }
+
   public MeshGeometry rotateY(float radians) {
     Quat q = new Quat();
     Quat.fromAxisAngle(Vec3.UP, radians, q);
@@ -124,8 +160,8 @@ public final class MeshGeometry {
   }
 
   public void setVertexColor(int vertex, float r, float g, float b, float a) {
-    if (colors.length < (usedVertexCount + 1) * 4) {
-      colors = growFloat(colors, (usedVertexCount + 1) * 4);
+    if (colors.length < (vertex + 1) * 4) {
+      colors = growFloat(colors, (vertex + 1) * 4);
     }
     int base = vertex * 4;
     colors[base] = r;
@@ -155,7 +191,7 @@ public final class MeshGeometry {
     System.arraycopy(part.uvs, 0, uvs, offset * 2, part.usedVertexCount * 2);
     if (part.colors.length > 0) {
       colors = growFloat(colors, (offset + part.usedVertexCount) * 4);
-      System.arraycopy(part.colors, 0, colors, offset * 4, part.colors.length);
+      System.arraycopy(part.colors, 0, colors, offset * 4, part.usedVertexCount * 4);
     }
     for (int i = 0; i < part.usedIndexCount; i++) {
       indices[usedIndexCount + i] = part.indices[i] + offset;

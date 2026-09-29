@@ -7,6 +7,7 @@ import com.poorfarmer.core.math.Mat4;
 import com.poorfarmer.core.math.Vec3;
 import com.poorfarmer.core.model.MeshGeometry;
 import com.poorfarmer.core.world.GameCamera;
+import com.poorfarmer.core.world.GrandfatherHouse;
 import com.poorfarmer.core.world.SkyPalette;
 import com.poorfarmer.core.world.SunState;
 import com.poorfarmer.core.world.Terrain;
@@ -221,6 +222,10 @@ public final class SceneRenderer implements AutoCloseable {
   private Mesh farmOverlay;
   private Mesh river;
   private Mesh mountains;
+  private GrandfatherHouse house;
+  private Mesh houseMesh;
+  private Mesh houseInteriorMesh;
+  private int houseVersion = -1;
   private final SkyRenderer skyRenderer = new SkyRenderer();
   private final CloudRenderer cloudRenderer = new CloudRenderer();
   private int farmTexture;
@@ -285,6 +290,10 @@ public final class SceneRenderer implements AutoCloseable {
     cloudRenderer.setCloudLayer(geometry);
   }
 
+  public void setHouse(GrandfatherHouse grandfatherHouse) {
+    house = grandfatherHouse;
+  }
+
   public void setTerrain(MeshGeometry geometry) {
     if (terrain != null) {
       terrain.close();
@@ -301,12 +310,16 @@ public final class SceneRenderer implements AutoCloseable {
     river = Mesh.upload(geometry);
   }
 
-  public void draw(GameCamera camera, SunState sun, SkyPalette palette, FarmGrid farm, float timeSeconds) {
+  public void draw(GameCamera camera, SunState sun, SkyPalette palette, FarmGrid farm,
+                   boolean houseInterior, float timeSeconds) {
     if (!ready || terrain == null) {
       return;
     }
     if (farm != null && farm.stateVersion() != farmVersion) {
       rebuildFarmOverlay(farm);
+    }
+    if (house != null && house.version() != houseVersion) {
+      rebuildHouseMeshes();
     }
     float[] fog = sun.fogColor();
     GLES30.glViewport(0, 0, viewportWidth, viewportHeight);
@@ -330,6 +343,11 @@ public final class SceneRenderer implements AutoCloseable {
       mountains.draw();
     }
     terrain.draw();
+    if (houseInteriorMesh != null && houseInterior) {
+      houseInteriorMesh.draw();
+    } else if (houseMesh != null) {
+      houseMesh.draw();
+    }
     if (farmOverlay != null) {
       uploadMoisture(farm);
       farmProgram.use();
@@ -367,6 +385,20 @@ public final class SceneRenderer implements AutoCloseable {
       program.uniform3f("uCamPos", eyeScratch.x, eyeScratch.y, eyeScratch.z);
       program.uniform1f("uTime", timeSeconds);
     }
+  }
+
+  private void rebuildHouseMeshes() {
+    if (houseMesh != null) {
+      houseMesh.close();
+      houseMesh = null;
+    }
+    if (houseInteriorMesh != null) {
+      houseInteriorMesh.close();
+      houseInteriorMesh = null;
+    }
+    houseMesh = Mesh.upload(house.exteriorMesh());
+    houseInteriorMesh = Mesh.upload(house.interiorMesh());
+    houseVersion = house.version();
   }
 
   private void uploadMoisture(FarmGrid farm) {
@@ -462,6 +494,16 @@ public final class SceneRenderer implements AutoCloseable {
       mountains.close();
       mountains = null;
     }
+    if (houseMesh != null) {
+      houseMesh.close();
+      houseMesh = null;
+    }
+    if (houseInteriorMesh != null) {
+      houseInteriorMesh.close();
+      houseInteriorMesh = null;
+    }
+    house = null;
+    houseVersion = -1;
     cloudRenderer.close();
     skyRenderer.close();
     if (farmTexture != 0) {

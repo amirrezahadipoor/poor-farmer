@@ -208,6 +208,27 @@ public final class MeshBuilderTest {
   }
 
   @Test
+  public void mergePreservesColorsOnTrimmedParts() {
+    MeshGeometry a = MeshBuilder.box(1f, 1f, 1f);
+    MeshGeometry b = MeshBuilder.box(2f, 2f, 2f);
+    for (int i = 0; i < a.vertexCount(); i++) {
+      a.setVertexColor(i, 1f, 0f, 0f, 1f);
+    }
+    for (int i = 0; i < b.vertexCount(); i++) {
+      b.setVertexColor(i, 0f, 1f, 0f, 1f);
+    }
+    MeshGeometry merged = MeshBuilder.merge(new MeshGeometry[]{a, b});
+    int va = a.vertexCount();
+    assertTrue(merged.hasColors());
+    assertEquals(1f, merged.colors[0], 0f);
+    assertEquals(0f, merged.colors[va * 4], 0f);
+    assertEquals(1f, merged.colors[va * 4 + 1], 0f);
+    for (int i = va; i < merged.vertexCount(); i++) {
+      assertTrue("index out of range for colors", (i + 1) * 4 <= merged.colors.length);
+    }
+  }
+
+  @Test
   public void translateAndScaleMoveGeometry() {
     MeshGeometry g = MeshBuilder.box(1f, 1f, 1f);
     g.scale(2f, 1f, 1f).translate(5f, 0f, 0f);

@@ -4,6 +4,7 @@ import com.poorfarmer.core.farm.FarmGrid;
 import com.poorfarmer.core.jobs.JobQueue;
 import com.poorfarmer.core.jobs.LoadingProgress;
 import com.poorfarmer.core.world.BootAssets;
+import com.poorfarmer.core.world.GrandfatherHouse;
 import com.poorfarmer.core.world.SkyPalette;
 import com.poorfarmer.core.world.SunState;
 
@@ -13,6 +14,8 @@ public final class Game {
   private final GameTime time = new GameTime();
   private final ScreenMachine screens = new ScreenMachine();
   private final FarmGrid farm = new FarmGrid();
+  private final GrandfatherHouse house = new GrandfatherHouse();
+  private boolean houseInterior;
   private final LoadingProgress loading = new LoadingProgress("در حال بارگذاری", 5);
   private JobQueue jobs;
   private BootAssets bootAssets;
@@ -40,6 +43,22 @@ public final class Game {
 
   public FarmGrid farm() {
     return farm;
+  }
+
+  public GrandfatherHouse house() {
+    return house;
+  }
+
+  public boolean inHouseInterior() {
+    return houseInterior;
+  }
+
+  public void setHouseInterior(boolean inside) {
+    houseInterior = inside;
+  }
+
+  public void setHouseStage(GrandfatherHouse.Stage stage) {
+    house.setStage(stage);
   }
 
   public SunState sunState() {

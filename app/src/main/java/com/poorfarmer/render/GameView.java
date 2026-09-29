@@ -88,7 +88,7 @@ public final class GameView extends GLSurfaceView {
       }
       float timeSeconds = (float) (System.nanoTime() / 1e9);
       postProcessor.beginScene();
-      sceneRenderer.draw(camera, sun, palette, game.farm(), timeSeconds);
+      sceneRenderer.draw(camera, sun, palette, game.farm(), game.inHouseInterior(), timeSeconds);
       postProcessor.endScene();
       PostProcessParams params = PostProcessParams.resolve(
           game.time().season(), sun.elevationDegrees(), sun.sunIntensity());
