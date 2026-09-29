@@ -11,12 +11,14 @@ public final class BootAssets {
   public final MeshGeometry mountainMesh;
   public final MeshGeometry cloudMesh;
   public final MeshGeometry buildingsMesh;
+  public final MeshGeometry villageMesh;
   public final Texture grass;
   public final Texture dirt;
   public final Texture stone;
 
   public BootAssets(Terrain terrain, MeshGeometry terrainMesh, MeshGeometry riverMesh,
                     MeshGeometry mountainMesh, MeshGeometry cloudMesh, MeshGeometry buildingsMesh,
+                    MeshGeometry villageMesh,
                     Texture grass, Texture dirt, Texture stone) {
     this.terrain = terrain;
     this.terrainMesh = terrainMesh;
@@ -24,6 +26,7 @@ public final class BootAssets {
     this.mountainMesh = mountainMesh;
     this.cloudMesh = cloudMesh;
     this.buildingsMesh = buildingsMesh;
+    this.villageMesh = villageMesh;
     this.grass = grass;
     this.dirt = dirt;
     this.stone = stone;

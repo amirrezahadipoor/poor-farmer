@@ -24,6 +24,7 @@ import com.poorfarmer.core.world.CloudLayer;
 import com.poorfarmer.core.world.FarmBuildings;
 import com.poorfarmer.core.world.River;
 import com.poorfarmer.core.world.Terrain;
+import com.poorfarmer.core.world.Village;
 import com.poorfarmer.render.DebugHudView;
 import com.poorfarmer.render.GameView;
 import com.poorfarmer.render.LoadingOverlayView;
@@ -116,6 +117,7 @@ public final class GameActivity extends Activity {
     MeshGeometry[] mountainMeshHolder = new MeshGeometry[1];
     MeshGeometry[] cloudMeshHolder = new MeshGeometry[1];
     MeshGeometry[] buildingsMeshHolder = new MeshGeometry[1];
+    MeshGeometry[] villageMeshHolder = new MeshGeometry[1];
     Texture[] textures = new Texture[3];
     jobs.submit(() -> {
       terrainHolder[0] = new Terrain(BOOT_SEED);
@@ -129,6 +131,7 @@ public final class GameActivity extends Activity {
       mountainMeshHolder[0] = new BackgroundMountains().toMesh(mountainNoise);
       cloudMeshHolder[0] = new CloudLayer().toMesh();
       buildingsMeshHolder[0] = new FarmBuildings().allMesh();
+      villageMeshHolder[0] = new Village(terrainHolder[0]).allMesh();
       loading.completeUnits(1);
       return meshHolder[0];
     });
@@ -145,6 +148,7 @@ public final class GameActivity extends Activity {
       return new BootAssets(
           terrainHolder[0], meshHolder[0], riverMeshHolder[0],
           mountainMeshHolder[0], cloudMeshHolder[0], buildingsMeshHolder[0],
+          villageMeshHolder[0],
           textures[0], textures[1], textures[2]);
     }, result -> {
       BootAssets assets = (BootAssets) result;
@@ -155,6 +159,7 @@ public final class GameActivity extends Activity {
       scene.setMountains(assets.mountainMesh);
       scene.setCloudLayer(assets.cloudMesh);
       scene.setBuildings(assets.buildingsMesh);
+      scene.setVillage(assets.villageMesh);
       scene.setHouse(game.house());
     });
   }
