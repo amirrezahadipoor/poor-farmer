@@ -1,10 +1,17 @@
 package com.poorfarmer.core;
 
+import com.poorfarmer.core.jobs.JobQueue;
+import com.poorfarmer.core.jobs.LoadingProgress;
+import com.poorfarmer.core.world.BootAssets;
+
 public final class Game {
 
   private final EventBus bus = new EventBus();
   private final GameTime time = new GameTime();
   private final ScreenMachine screens = new ScreenMachine();
+  private final LoadingProgress loading = new LoadingProgress("در حال بارگذاری", 4);
+  private JobQueue jobs;
+  private BootAssets bootAssets;
   private boolean running;
 
   public Game() {
@@ -21,6 +28,25 @@ public final class Game {
 
   public ScreenMachine screens() {
     return screens;
+  }
+
+  public JobQueue jobs() {
+    if (jobs == null) {
+      jobs = new JobQueue();
+    }
+    return jobs;
+  }
+
+  public LoadingProgress loading() {
+    return loading;
+  }
+
+  public BootAssets bootAssets() {
+    return bootAssets;
+  }
+
+  public void setBootAssets(BootAssets assets) {
+    this.bootAssets = assets;
   }
 
   public boolean running() {

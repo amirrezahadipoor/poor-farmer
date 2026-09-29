@@ -65,6 +65,7 @@ public final class GameView extends GLSurfaceView {
       float frameSeconds = lastFrameNanos == 0L ? 0f : (nowNanos - lastFrameNanos) / 1_000_000_000f;
       lastFrameNanos = nowNanos;
       loop.accumulateAndStep(frameSeconds, game::tick);
+      game.jobs().pollCallbacks();
       camera.update(frameSeconds);
       postProcessor.beginScene();
       renderer.onDrawFrame(gl, loop.interpolationAlpha());
