@@ -11,6 +11,7 @@ import com.poorfarmer.core.Quality;
 import com.poorfarmer.core.profiler.FpsMeter;
 import com.poorfarmer.core.world.GameCamera;
 import com.poorfarmer.core.world.PostProcessParams;
+import com.poorfarmer.core.world.SkyPalette;
 import com.poorfarmer.core.world.SunState;
 import com.poorfarmer.core.world.Terrain;
 
@@ -38,6 +39,7 @@ public final class GameView extends GLSurfaceView {
     setEGLContextClientVersion(3);
     setRenderer(glRenderer);
     setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
+    sceneRenderer.setCloudsEnabled(QUALITY != Quality.LOW);
   }
 
   public FpsMeter fpsMeter() {
@@ -79,11 +81,14 @@ public final class GameView extends GLSurfaceView {
       game.jobs().pollCallbacks();
       camera.update(frameSeconds);
       SunState sun = game.sunState();
+      SkyPalette palette = game.skyPalette();
       if (sun == null) {
         sun = new SunState(9f, 0);
+        palette = new SkyPalette(sun.elevationDegrees(), sun.sunIntensity(), 0);
       }
+      float timeSeconds = (float) (System.nanoTime() / 1e9);
       postProcessor.beginScene();
-      sceneRenderer.draw(camera, sun, game.farm(), (float) (System.nanoTime() / 1e9));
+      sceneRenderer.draw(camera, sun, palette, game.farm(), timeSeconds);
       postProcessor.endScene();
       PostProcessParams params = PostProcessParams.resolve(
           game.time().season(), sun.elevationDegrees(), sun.sunIntensity());

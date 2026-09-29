@@ -4,6 +4,7 @@ import com.poorfarmer.core.farm.FarmGrid;
 import com.poorfarmer.core.jobs.JobQueue;
 import com.poorfarmer.core.jobs.LoadingProgress;
 import com.poorfarmer.core.world.BootAssets;
+import com.poorfarmer.core.world.SkyPalette;
 import com.poorfarmer.core.world.SunState;
 
 public final class Game {
@@ -16,6 +17,7 @@ public final class Game {
   private JobQueue jobs;
   private BootAssets bootAssets;
   private SunState sun;
+  private SkyPalette skyPalette;
   private int sunMinute = -1;
   private int sunSeason = -1;
   private boolean running;
@@ -42,6 +44,10 @@ public final class Game {
 
   public SunState sunState() {
     return sun;
+  }
+
+  public SkyPalette skyPalette() {
+    return skyPalette;
   }
 
   public JobQueue jobs() {
@@ -88,6 +94,7 @@ public final class Game {
     int season = time.season();
     if (sun == null || minute != sunMinute || season != sunSeason) {
       sun = new SunState(minute / 60f, season);
+      skyPalette = new SkyPalette(sun.elevationDegrees(), sun.sunIntensity(), season);
       sunMinute = minute;
       sunSeason = season;
     }

@@ -7,6 +7,7 @@ import com.poorfarmer.core.math.Mat4;
 import com.poorfarmer.core.math.Vec3;
 import com.poorfarmer.core.model.MeshGeometry;
 import com.poorfarmer.core.world.GameCamera;
+import com.poorfarmer.core.world.SkyPalette;
 import com.poorfarmer.core.world.SunState;
 import com.poorfarmer.core.world.Terrain;
 
@@ -219,14 +220,20 @@ public final class SceneRenderer implements AutoCloseable {
   private Mesh terrain;
   private Mesh farmOverlay;
   private Mesh river;
+  private Mesh mountains;
+  private final SkyRenderer skyRenderer = new SkyRenderer();
+  private final CloudRenderer cloudRenderer = new CloudRenderer();
   private int farmTexture;
   private int farmVersion = -1;
   private int viewportWidth;
   private int viewportHeight;
+  private boolean cloudsEnabled = true;
   private boolean ready;
 
   public void onSurfaceCreated(GL10 gl, EGLConfig config) {
     close();
+    skyRenderer.onSurfaceCreated(gl, config);
+    cloudRenderer.onSurfaceCreated(gl, config);
     terrainProgram = ShaderProgram.create(TERRAIN_VERTEX, LIT_FRAGMENT)
         .bindAttribute(Mesh.ATTR_POSITION, "aPosition")
         .bindAttribute(Mesh.ATTR_NORMAL, "aNormal")
@@ -259,6 +266,23 @@ public final class SceneRenderer implements AutoCloseable {
   public void onSurfaceChanged(GL10 gl, int width, int height) {
     viewportWidth = width;
     viewportHeight = height;
+    skyRenderer.setViewport(width, height);
+  }
+
+  public void setCloudsEnabled(boolean enabled) {
+    cloudsEnabled = enabled;
+  }
+
+  public void setMountains(MeshGeometry geometry) {
+    if (mountains != null) {
+      mountains.close();
+      mountains = null;
+    }
+    mountains = Mesh.upload(geometry);
+  }
+
+  public void setCloudLayer(MeshGeometry geometry) {
+    cloudRenderer.setCloudLayer(geometry);
   }
 
   public void setTerrain(MeshGeometry geometry) {
@@ -277,7 +301,7 @@ public final class SceneRenderer implements AutoCloseable {
     river = Mesh.upload(geometry);
   }
 
-  public void draw(GameCamera camera, SunState sun, FarmGrid farm, float timeSeconds) {
+  public void draw(GameCamera camera, SunState sun, SkyPalette palette, FarmGrid farm, float timeSeconds) {
     if (!ready || terrain == null) {
       return;
     }
@@ -288,16 +312,23 @@ public final class SceneRenderer implements AutoCloseable {
     GLES30.glViewport(0, 0, viewportWidth, viewportHeight);
     GLES30.glClearColor(fog[0], fog[1], fog[2], 1f);
     GLES30.glClear(GLES30.GL_COLOR_BUFFER_BIT | GLES30.GL_DEPTH_BUFFER_BIT);
-    GLES30.glEnable(GLES30.GL_DEPTH_TEST);
-    GLES30.glEnable(GLES30.GL_CULL_FACE);
-    GLES30.glFrontFace(GLES30.GL_CCW);
-    GLES30.glCullFace(GLES30.GL_BACK);
     float aspect = (float) viewportWidth / (float) viewportHeight;
     camera.fillView(viewScratch);
     camera.fillProjection(projectionScratch, aspect);
     camera.fillEye(eyeScratch);
+    GLES30.glDisable(GLES30.GL_DEPTH_TEST);
+    GLES30.glDepthMask(false);
+    skyRenderer.draw(camera, sun, palette, timeSeconds);
+    GLES30.glDepthMask(true);
+    GLES30.glEnable(GLES30.GL_DEPTH_TEST);
+    GLES30.glEnable(GLES30.GL_CULL_FACE);
+    GLES30.glFrontFace(GLES30.GL_CCW);
+    GLES30.glCullFace(GLES30.GL_BACK);
     terrainProgram.use();
     applySharedUniforms(terrainProgram, sun, fog, null);
+    if (mountains != null) {
+      mountains.draw();
+    }
     terrain.draw();
     if (farmOverlay != null) {
       uploadMoisture(farm);
@@ -312,6 +343,9 @@ public final class SceneRenderer implements AutoCloseable {
       waterProgram.use();
       applySharedUniforms(waterProgram, sun, fog, timeSeconds);
       river.draw();
+    }
+    if (cloudsEnabled) {
+      cloudRenderer.draw(viewScratch, projectionScratch, sun, palette, timeSeconds);
     }
   }
 
@@ -424,6 +458,12 @@ public final class SceneRenderer implements AutoCloseable {
       river.close();
       river = null;
     }
+    if (mountains != null) {
+      mountains.close();
+      mountains = null;
+    }
+    cloudRenderer.close();
+    skyRenderer.close();
     if (farmTexture != 0) {
       GLES30.glDeleteTextures(1, new int[]{farmTexture}, 0);
       farmTexture = 0;

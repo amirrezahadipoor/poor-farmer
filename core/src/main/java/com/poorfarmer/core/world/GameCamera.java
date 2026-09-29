@@ -118,10 +118,21 @@ public final class GameCamera {
         center.y + (float) Math.cos(yaw) * horiz);
   }
 
+  public static final float TAN_HALF_FOV = (float) Math.tan(Math.toRadians(FOV_DEG / 2f));
+
   public void fillEye(Vec3 out) {
     float horiz = zoom * (float) Math.cos(pitch);
     float vert = zoom * (float) Math.sin(pitch);
     out.set(center.x + (float) Math.sin(yaw) * horiz, vert, center.y + (float) Math.cos(yaw) * horiz);
+  }
+
+  public void fillRight(Vec3 out) {
+    out.set((float) Math.cos(yaw), 0f, -(float) Math.sin(yaw));
+  }
+
+  public void fillForward(Vec3 out) {
+    float cosPitch = (float) Math.cos(pitch);
+    out.set(-(float) Math.sin(yaw) * cosPitch, -(float) Math.sin(pitch), -(float) Math.cos(yaw) * cosPitch);
   }
 
   public Mat4 viewMatrix() {

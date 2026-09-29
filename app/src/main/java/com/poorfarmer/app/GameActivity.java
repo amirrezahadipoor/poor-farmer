@@ -18,12 +18,15 @@ import com.poorfarmer.core.procedural.Texture;
 import com.poorfarmer.core.profiler.JvmMemoryProbe;
 import com.poorfarmer.core.save.AtomicFileStore;
 import com.poorfarmer.core.save.SessionState;
+import com.poorfarmer.core.world.BackgroundMountains;
 import com.poorfarmer.core.world.BootAssets;
+import com.poorfarmer.core.world.CloudLayer;
 import com.poorfarmer.core.world.River;
 import com.poorfarmer.core.world.Terrain;
 import com.poorfarmer.render.DebugHudView;
 import com.poorfarmer.render.GameView;
 import com.poorfarmer.render.LoadingOverlayView;
+import com.poorfarmer.render.SceneRenderer;
 
 import java.io.File;
 
@@ -109,6 +112,8 @@ public final class GameActivity extends Activity {
     Terrain[] terrainHolder = new Terrain[1];
     MeshGeometry[] meshHolder = new MeshGeometry[1];
     MeshGeometry[] riverMeshHolder = new MeshGeometry[1];
+    MeshGeometry[] mountainMeshHolder = new MeshGeometry[1];
+    MeshGeometry[] cloudMeshHolder = new MeshGeometry[1];
     Texture[] textures = new Texture[3];
     jobs.submit(() -> {
       terrainHolder[0] = new Terrain(BOOT_SEED);
@@ -118,6 +123,9 @@ public final class GameActivity extends Activity {
     jobs.submit(() -> {
       meshHolder[0] = terrainHolder[0].toMesh(TERRAIN_MESH_STEP);
       riverMeshHolder[0] = new River().toMesh(terrainHolder[0], TERRAIN_MESH_STEP);
+      Noise mountainNoise = new Noise(BOOT_SEED + 7919L);
+      mountainMeshHolder[0] = new BackgroundMountains().toMesh(mountainNoise);
+      cloudMeshHolder[0] = new CloudLayer().toMesh();
       loading.completeUnits(1);
       return meshHolder[0];
     });
@@ -133,12 +141,16 @@ public final class GameActivity extends Activity {
       loading.completeUnits(1);
       return new BootAssets(
           terrainHolder[0], meshHolder[0], riverMeshHolder[0],
+          mountainMeshHolder[0], cloudMeshHolder[0],
           textures[0], textures[1], textures[2]);
     }, result -> {
       BootAssets assets = (BootAssets) result;
       game.setBootAssets(assets);
-      gameView.sceneRenderer().setTerrain(assets.terrainMesh);
-      gameView.sceneRenderer().setRiver(assets.riverMesh);
+      SceneRenderer scene = gameView.sceneRenderer();
+      scene.setTerrain(assets.terrainMesh);
+      scene.setRiver(assets.riverMesh);
+      scene.setMountains(assets.mountainMesh);
+      scene.setCloudLayer(assets.cloudMesh);
     });
   }
 }
