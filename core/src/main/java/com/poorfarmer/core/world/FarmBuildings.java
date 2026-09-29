@@ -90,7 +90,7 @@ public final class FarmBuildings {
         return new MeshGeometry[]{
             part(MeshBuilder.box(2f, 1.4f, 1.8f), COOP_WALL, 0f, 0.7f, 0f),
             part(MeshBuilder.box(0.4f, 0.5f, 0.06f), DOOR_WOOD, 0.4f, 0.25f, 0.9f),
-            part(rotatedRoof(2.4f, 2.2f, 0.5f), COOP_ROOF, 0f, 1.8f, 0f),
+            part(rotatedRoof(2.4f, 2.2f, 0.5f), COOP_ROOF, 0f, 1.95f, 0f),
             part(slantedRamp(1.0f, 0.8f, -0.5f), RAMP, 1.5f, 0.4f, 0f)};
       case BEEHIVE:
         return new MeshGeometry[]{
@@ -127,7 +127,7 @@ public final class FarmBuildings {
       case CARPET_WORKSHOP:
         return new MeshGeometry[]{
             part(MeshBuilder.box(5f, 2.2f, 3f), WORKSHOP_WALL, 0f, 1.1f, 0f),
-            part(rotatedRoof(5.4f, 3.4f, 0.45f), WORKSHOP_ROOF, 0f, 2.5f, 0f),
+            part(MeshBuilder.box(5.4f, 0.1f, 3.4f), WORKSHOP_ROOF, 0f, 2.25f, 0f),
             part(MeshBuilder.box(1.2f, 1.6f, 0.08f), DOOR_WOOD, -1.5f, 0.8f, 1.5f),
             part(MeshBuilder.box(1.2f, 1.0f, 0.06f), GLASS, 1.3f, 1.3f, 1.5f)};
       case SAFFRON_DRYER:
