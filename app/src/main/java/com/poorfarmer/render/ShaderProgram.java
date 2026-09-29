@@ -2,8 +2,11 @@ package com.poorfarmer.render;
 
 import android.opengl.GLES30;
 
+import com.poorfarmer.core.GlslValidator;
+
 import java.nio.IntBuffer;
 import java.util.HashMap;
+import java.util.List;
 
 public final class ShaderProgram implements AutoCloseable {
 
@@ -12,12 +15,6 @@ public final class ShaderProgram implements AutoCloseable {
   private static int shaderCompileStatus(int shader) {
     INT_OUT.clear();
     GLES30.glGetShaderiv(shader, GLES30.GL_COMPILE_STATUS, INT_OUT);
-    return INT_OUT.get(0);
-  }
-
-  private static int shaderLogLength(int shader) {
-    INT_OUT.clear();
-    GLES30.glGetShaderiv(shader, GLES30.GL_INFO_LOG_LENGTH, INT_OUT);
     return INT_OUT.get(0);
   }
 
@@ -36,14 +33,67 @@ public final class ShaderProgram implements AutoCloseable {
     this.id = id;
   }
 
-  public static ShaderProgram compile(String vertexSource, String fragmentSource) {
+  public static Builder create(String vertexSource, String fragmentSource) {
+    List<String> vertexErrors = GlslValidator.validate(vertexSource);
+    if (!vertexErrors.isEmpty()) {
+      throw new RenderException("vertex shader rejected: " + vertexErrors);
+    }
+    List<String> fragmentErrors = GlslValidator.validate(fragmentSource);
+    if (!fragmentErrors.isEmpty()) {
+      throw new RenderException("fragment shader rejected: " + fragmentErrors);
+    }
     int vertex = compileStage(GLES30.GL_VERTEX_SHADER, vertexSource);
     int fragment = compileStage(GLES30.GL_FRAGMENT_SHADER, fragmentSource);
-    try {
-      return link(vertex, fragment);
-    } finally {
+    int program = GLES30.glCreateProgram();
+    if (program == 0) {
       GLES30.glDeleteShader(vertex);
       GLES30.glDeleteShader(fragment);
+      throw new RenderException("glCreateProgram returned 0");
+    }
+    GLES30.glAttachShader(program, vertex);
+    GLES30.glAttachShader(program, fragment);
+    return new Builder(program, vertex, fragment);
+  }
+
+  public static ShaderProgram compile(String vertexSource, String fragmentSource) {
+    return create(vertexSource, fragmentSource).link();
+  }
+
+  public static final class Builder {
+
+    private final int program;
+    private final int vertex;
+    private final int fragment;
+
+    private Builder(int program, int vertex, int fragment) {
+      this.program = program;
+      this.vertex = vertex;
+      this.fragment = fragment;
+    }
+
+    public Builder bindAttribute(int index, String name) {
+      GLES30.glBindAttribLocation(program, index, name);
+      return this;
+    }
+
+    public ShaderProgram link() {
+      GLES30.glLinkProgram(program);
+      if (programLinkStatus(program) == 0) {
+        String log = GLES30.glGetProgramInfoLog(program);
+        abort();
+        throw new RenderException("program link failed, info log: " + log);
+      }
+      GLES30.glDeleteShader(vertex);
+      GLES30.glDeleteShader(fragment);
+      return new ShaderProgram(program);
+    }
+
+    public void abort() {
+      GLES30.glDetachShader(program, vertex);
+      GLES30.glDetachShader(program, fragment);
+      GLES30.glDeleteShader(vertex);
+      GLES30.glDeleteShader(fragment);
+      GLES30.glDeleteProgram(program);
     }
   }
 
@@ -56,28 +106,10 @@ public final class ShaderProgram implements AutoCloseable {
     GLES30.glCompileShader(shader);
     if (shaderCompileStatus(shader) == 0) {
       String log = GLES30.glGetShaderInfoLog(shader);
-      int logLength = shaderLogLength(shader);
       GLES30.glDeleteShader(shader);
-      throw new RenderException(stageName(type) + " shader failed to compile, info log ("
-          + logLength + " chars): " + log);
+      throw new RenderException(stageName(type) + " shader failed to compile, info log: " + log);
     }
     return shader;
-  }
-
-  private static ShaderProgram link(int vertex, int fragment) {
-    int program = GLES30.glCreateProgram();
-    if (program == 0) {
-      throw new RenderException("glCreateProgram returned 0");
-    }
-    GLES30.glAttachShader(program, vertex);
-    GLES30.glAttachShader(program, fragment);
-    GLES30.glLinkProgram(program);
-    if (programLinkStatus(program) == 0) {
-      String log = GLES30.glGetProgramInfoLog(program);
-      GLES30.glDeleteProgram(program);
-      throw new RenderException("program link failed, info log: " + log);
-    }
-    return new ShaderProgram(program);
   }
 
   private static String stageName(int type) {
@@ -87,11 +119,6 @@ public final class ShaderProgram implements AutoCloseable {
   public void use() {
     throwIfClosed();
     GLES30.glUseProgram(id);
-  }
-
-  public void bindAttribute(int index, String name) {
-    throwIfClosed();
-    GLES30.glBindAttribLocation(id, index, name);
   }
 
   public int programId() {
