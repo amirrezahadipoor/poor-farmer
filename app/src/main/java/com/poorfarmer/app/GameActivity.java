@@ -17,7 +17,7 @@ public final class GameActivity extends Activity {
     super.onCreate(savedInstanceState);
     setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
     game = new Game();
-    gameView = new GameView(this);
+    gameView = new GameView(this, game);
     setContentView(gameView);
   }
 
