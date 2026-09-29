@@ -47,12 +47,12 @@ public final class Mesh implements AutoCloseable {
     }
     GLES30.glBindVertexArray(vao);
     int[] buffers = new int[4];
-    buffers[ATTR_POSITION] = uploadFloatBuffer(geometry.positions, 3, ATTR_POSITION);
-    buffers[ATTR_NORMAL] = uploadFloatBuffer(geometry.normals, 3, ATTR_NORMAL);
-    buffers[ATTR_UV] = uploadFloatBuffer(geometry.uvs, 2, ATTR_UV);
+    buffers[ATTR_POSITION] = uploadStaticFloatBuffer(geometry.positions, 3, ATTR_POSITION);
+    buffers[ATTR_NORMAL] = uploadStaticFloatBuffer(geometry.normals, 3, ATTR_NORMAL);
+    buffers[ATTR_UV] = uploadStaticFloatBuffer(geometry.uvs, 2, ATTR_UV);
     boolean hasColors = geometry.hasColors();
     if (hasColors) {
-      buffers[ATTR_COLOR] = uploadFloatBuffer(geometry.colors, 4, ATTR_COLOR);
+      buffers[ATTR_COLOR] = uploadStaticFloatBuffer(geometry.colors, 4, ATTR_COLOR);
     } else {
       GLES30.glDisableVertexAttribArray(ATTR_COLOR);
     }
@@ -71,7 +71,7 @@ public final class Mesh implements AutoCloseable {
     return new Mesh(vao, indexBuffer, buffers, geometry.indexCount(), hasColors);
   }
 
-  private static int uploadFloatBuffer(float[] data, int components, int attribute) {
+  public static int uploadStaticFloatBuffer(float[] data, int components, int attribute) {
     FloatBuffer buffer = ByteBuffer.allocateDirect(data.length * 4).order(ByteOrder.nativeOrder()).asFloatBuffer();
     buffer.put(data).flip();
     int vbo = generateBuffer();
