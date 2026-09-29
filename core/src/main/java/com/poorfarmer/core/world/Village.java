@@ -92,16 +92,25 @@ public final class Village {
             part(MeshBuilder.box(1.4f, 1.0f, 0.06f), GLASS_PANE, -1.4f, 1.5f, 2.0f),
             part(MeshBuilder.box(1.4f, 1.0f, 0.06f), GLASS_PANE, 0f, 1.5f, 2.0f),
             part(MeshBuilder.box(0.5f, 0.5f, 0.5f), TEA_ROOF, 2.8f, 2.9f, 1.8f)};
-      case COOPERATIVE:
+      case COOPERATIVE: {
+        MeshGeometry coopEastGable = MeshBuilder.extrude(
+            new float[][]{{-2.98f, -2.5f}, {-2.98f, 2.5f}, {-4.38f, 0f}}, 0.25f);
+        coopEastGable.rotateZ(-(float) Math.PI / 2f);
+        MeshGeometry coopWestGable = MeshBuilder.extrude(
+            new float[][]{{-2.98f, -2.5f}, {-2.98f, 2.5f}, {-4.38f, 0f}}, 0.25f);
+        coopWestGable.rotateZ(-(float) Math.PI / 2f);
         return new MeshGeometry[]{
             pad(5.5f),
             part(MeshBuilder.box(8f, 3f, 5f), COOP_WALL, 0f, 1.5f, 0f),
             part(rotatedRoof(8.4f, 2.8f, 0.5f), COOP_ROOF, 0f, 3.7f, 1.4f),
             part(rotatedRoof(8.4f, 2.8f, -0.5f), COOP_ROOF, 0f, 3.7f, -1.4f),
             part(MeshBuilder.box(8.4f, 0.12f, 0.12f), DOOR, 0f, 4.5f, 0f),
+            part(coopEastGable, COOP_WALL, 3.75f, 0f, 0f),
+            part(coopWestGable, COOP_WALL, -3.75f, 0f, 0f),
             part(MeshBuilder.box(2f, 2.2f, 0.1f), DOOR, 0f, 1.1f, 2.5f),
             part(MeshBuilder.box(0.1f, 0.9f, 3f), WINDOW, -2.8f, 1.9f, 2.5f),
             part(MeshBuilder.box(0.1f, 0.9f, 3f), WINDOW, 2.8f, 1.9f, 2.5f)};
+      }
       case TRACTOR_REPAIR:
         return new MeshGeometry[]{
             pad(4.5f),

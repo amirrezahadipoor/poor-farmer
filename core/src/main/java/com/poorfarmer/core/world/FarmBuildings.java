@@ -72,13 +72,22 @@ public final class FarmBuildings {
 
   private static MeshGeometry[] buildKind(BuildingKind kind) {
     switch (kind) {
-      case BARN:
+      case BARN: {
+        MeshGeometry barnEastGable = MeshBuilder.extrude(
+            new float[][]{{-2.38f, -2.0f}, {-2.38f, 2.0f}, {-4.0f, 0f}}, 0.25f);
+        barnEastGable.rotateZ(-(float) Math.PI / 2f);
+        MeshGeometry barnWestGable = MeshBuilder.extrude(
+            new float[][]{{-2.38f, -2.0f}, {-2.38f, 2.0f}, {-4.0f, 0f}}, 0.25f);
+        barnWestGable.rotateZ(-(float) Math.PI / 2f);
         return new MeshGeometry[]{
             part(MeshBuilder.box(5f, 2.4f, 4f), BARN_WALL, 0f, 1.2f, 0f),
             part(MeshBuilder.box(1f, 1.8f, 0.08f), DOOR_WOOD, 1.5f, 0.9f, 2.0f),
-            part(rotatedRoof(5.4f, 2.6f, 0.65f), BARN_ROOF, 0f, 2.95f, 1.3f),
-            part(rotatedRoof(5.4f, 2.6f, -0.65f), BARN_ROOF, 0f, 2.95f, -1.3f),
-            part(MeshBuilder.box(5.4f, 0.1f, 0.1f), DOOR_WOOD, 0f, 3.6f, 0f)};
+            part(rotatedRoof(5.4f, 2.6f, 0.65f), BARN_ROOF, 0f, 3.2f, 1.3f),
+            part(rotatedRoof(5.4f, 2.6f, -0.65f), BARN_ROOF, 0f, 3.2f, -1.3f),
+            part(MeshBuilder.box(5.4f, 0.1f, 0.1f), DOOR_WOOD, 0f, 4.02f, 0f),
+            part(barnEastGable, BARN_WALL, 2.25f, 0f, 0f),
+            part(barnWestGable, BARN_WALL, -2.25f, 0f, 0f)};
+      }
       case LIVESTOCK_SHED:
         return new MeshGeometry[]{
             part(MeshBuilder.box(4.5f, 2.2f, 0.2f), SHED_WALL, 0f, 1.1f, -1.65f),

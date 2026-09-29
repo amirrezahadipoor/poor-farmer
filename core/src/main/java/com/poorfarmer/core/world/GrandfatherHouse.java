@@ -101,10 +101,10 @@ public final class GrandfatherHouse {
       MeshGeometry northRoof = MeshBuilder.box(6.5f, 0.08f, 3.2f);
       northRoof.rotateX(-ROOF_ANGLE);
       MeshGeometry eastGable = MeshBuilder.extrude(
-          new float[][]{{-2.6f, -2.5f}, {-2.6f, 2.5f}, {-4.4f, 0f}}, 0.25f);
+          new float[][]{{-3.78f, -2.5f}, {-3.78f, 2.5f}, {-5.64f, 0f}}, 0.25f);
       eastGable.rotateZ(-(float) Math.PI / 2f);
       MeshGeometry westGable = MeshBuilder.extrude(
-          new float[][]{{-2.6f, -2.5f}, {-2.6f, 2.5f}, {-4.4f, 0f}}, 0.25f);
+          new float[][]{{-3.78f, -2.5f}, {-3.78f, 2.5f}, {-5.64f, 0f}}, 0.25f);
       westGable.rotateZ(-(float) Math.PI / 2f);
       float[] roofColor = stage == Stage.FULL ? ROOF_TILE : ROOF_PLANK;
       parts = new MeshGeometry[]{
@@ -117,17 +117,17 @@ public final class GrandfatherHouse {
           part(MeshBuilder.box(0.12f, 2.1f, 0.14f), WOOD, -0.62f, 2.25f, 2.37f),
           part(MeshBuilder.box(0.12f, 2.1f, 0.14f), WOOD, 0.62f, 2.25f, 2.37f),
           part(MeshBuilder.box(1.36f, 0.14f, 0.14f), WOOD, 0f, 3.35f, 2.37f),
-          part(southRoof, roofColor, 0f, 3.5f, 1.25f),
-          part(northRoof, roofColor, 0f, 3.5f, -1.25f),
-          part(MeshBuilder.box(6.5f, 0.12f, 0.12f), WOOD, 0f, 4.42f, 0f),
-          part(eastGable, MUD_BRICK, 2.875f, 0f, 0f),
-          part(westGable, MUD_BRICK, -2.875f, 0f, 0f),
+          part(southRoof, roofColor, 0f, 4.7f, 1.25f),
+          part(northRoof, roofColor, 0f, 4.7f, -1.25f),
+          part(MeshBuilder.box(6.5f, 0.12f, 0.12f), WOOD, 0f, 5.64f, 0f),
+          part(eastGable, MUD_BRICK, 2.75f, 0f, 0f),
+          part(westGable, MUD_BRICK, -2.75f, 0f, 0f),
           part(MeshBuilder.box(5.9f, 0.1f, 4.9f), FLOOR_DARK, 0f, 1.25f, 0f)};
       if (stage == Stage.FULL) {
         MeshGeometry[] withExtras = new MeshGeometry[parts.length + 8];
         System.arraycopy(parts, 0, withExtras, 0, parts.length);
-        withExtras[parts.length] = part(MeshBuilder.box(0.5f, 1.4f, 0.5f), CHIMNEY, 1.6f, 4.5f, -0.8f);
-        withExtras[parts.length + 1] = part(MeshBuilder.box(0.2f, 0.1f, 0.2f), CHIMNEY, 1.6f, 5.25f, -0.8f);
+        withExtras[parts.length] = part(MeshBuilder.box(0.5f, 1.6f, 0.5f), CHIMNEY, 1.6f, 5.35f, -0.8f);
+        withExtras[parts.length + 1] = part(MeshBuilder.box(0.62f, 0.12f, 0.62f), CHIMNEY, 1.6f, 6.2f, -0.8f);
         withExtras[parts.length + 2] = part(MeshBuilder.box(1.1f, 1.1f, 0.1f), WOOD, -1.5f, 2.6f, -2.37f);
         withExtras[parts.length + 3] = part(MeshBuilder.box(0.9f, 0.9f, 0.02f), GLASS, -1.5f, 2.6f, -2.39f);
         withExtras[parts.length + 4] = part(MeshBuilder.box(1.1f, 1.1f, 0.1f), WOOD, 1.5f, 2.6f, 2.37f);
