@@ -79,7 +79,7 @@
 - [x] 0.04 GitHub Actions: بیلد، تست واحد، lint، بررسی نبودِ کامنت
 - [x] 0.05 ساخت `docs/STATE.md`، `docs/DESIGN.md`، `docs/BALANCE.md`
 - [x] 0.06 ساخت Milestone و Label و Issue برای همه‌ی فازها با API
-- [ ] 0.07 ساختار پکیج‌ها و کلاس پایه‌ی `Game` با state machine صفحه‌ها
+- [x] 0.07 ساختار پکیج‌ها و کلاس پایه‌ی `Game` با state machine صفحه‌ها
 
 ### فاز ۱ — موتور
 
