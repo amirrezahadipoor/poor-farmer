@@ -7,8 +7,11 @@ import com.poorfarmer.core.procedural.Noise;
 public final class Terrain {
 
   public static final float WORLD_HALF = 120f;
-  public static final float FARM_FLATTEN_RADIUS = 56f;
+  public static final float FARM_FLAT_RADIUS = 36f;
+  public static final float FARM_FLATTEN_RADIUS = FARM_FLAT_RADIUS + 12f;
   public static final float FARM_MAX_HEIGHT = 1.2f;
+  public static final float VALLEY_DEPTH = 4f;
+  public static final float VALLEY_HALF_WIDTH = 24f;
 
   private final long seed;
   private final float[] heights;
@@ -52,18 +55,25 @@ public final class Terrain {
     return top + (bottom - top) * tz;
   }
 
+  static float valleyCenterZ(float x) {
+    return (float) Math.sin(x * 0.011f) * 10f;
+  }
+
   static float sampleHeight(Noise noise, float x, float z) {
     float rolling = noise.fbm2(x * 0.012f, z * 0.012f, 4, 0.5f, 2f);
     float detail = noise.fbm2(x * 0.05f, z * 0.05f, 3, 0.5f, 2f);
-    float base = rolling * 7f + detail * 1.2f;
     float dx = x / WORLD_HALF;
     float dz = z / WORLD_HALF;
     float edge = Math.max(Math.abs(dx), Math.abs(dz));
     float foothill = smoothstep(0.45f, 1f, edge) * 26f;
     float ridge = smoothstep(0.7f, 1f, edge) * noise.fbm2(x * 0.02f, z * 0.02f, 3, 0.5f, 2f) * 14f;
-    float height = base + foothill + ridge;
+    float vz = Math.abs(z - valleyCenterZ(x));
+    float vt = clamp(vz / VALLEY_HALF_WIDTH, 0f, 1f);
+    float valley = -VALLEY_DEPTH * (1f - smoothstep(0f, 1f, vt));
+    float base = rolling * 7f + detail * 1.2f;
+    float height = base + foothill + ridge + valley;
     float dist = (float) Math.sqrt(x * x + z * z);
-    float flatten = 1f - smoothstep(0f, FARM_FLATTEN_RADIUS, dist);
+    float flatten = 1f - smoothstep(FARM_FLAT_RADIUS, FARM_FLATTEN_RADIUS, dist);
     height = height * (1f - flatten) + FARM_MAX_HEIGHT * flatten;
     return height;
   }

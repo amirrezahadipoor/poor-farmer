@@ -124,30 +124,41 @@ public final class Mat4 {
   }
 
   public Mat4 lookAt(Vec3 eye, Vec3 center, Vec3 up) {
-    Vec3 back = new Vec3(eye).sub(center).normalize();
-    Vec3 right = new Vec3();
-    Vec3.cross(up, back, right);
-    right.normalize();
-    Vec3 camUp = new Vec3();
-    Vec3.cross(back, right, camUp);
+    float bx = eye.x - center.x;
+    float by = eye.y - center.y;
+    float bz = eye.z - center.z;
+    float blen = (float) Math.sqrt(bx * bx + by * by + bz * bz);
+    bx /= blen;
+    by /= blen;
+    bz /= blen;
+    float rx = up.y * bz - up.z * by;
+    float ry = up.z * bx - up.x * bz;
+    float rz = up.x * by - up.y * bx;
+    float rlen = (float) Math.sqrt(rx * rx + ry * ry + rz * rz);
+    rx /= rlen;
+    ry /= rlen;
+    rz /= rlen;
+    float ux = by * rz - bz * ry;
+    float uy = bz * rx - bx * rz;
+    float uz = bx * ry - by * rx;
     for (int i = 0; i < 16; i++) {
       data[i] = 0f;
     }
-    data[0] = right.x;
-    data[1] = camUp.x;
-    data[2] = back.x;
+    data[0] = rx;
+    data[1] = ux;
+    data[2] = bx;
     data[3] = 0f;
-    data[4] = right.y;
-    data[5] = camUp.y;
-    data[6] = back.y;
+    data[4] = ry;
+    data[5] = uy;
+    data[6] = by;
     data[7] = 0f;
-    data[8] = right.z;
-    data[9] = camUp.z;
-    data[10] = back.z;
+    data[8] = rz;
+    data[9] = uz;
+    data[10] = bz;
     data[11] = 0f;
-    data[12] = -right.dot(eye);
-    data[13] = -camUp.dot(eye);
-    data[14] = -back.dot(eye);
+    data[12] = -(rx * eye.x + ry * eye.y + rz * eye.z);
+    data[13] = -(ux * eye.x + uy * eye.y + uz * eye.z);
+    data[14] = -(bx * eye.x + by * eye.y + bz * eye.z);
     data[15] = 1f;
     return this;
   }

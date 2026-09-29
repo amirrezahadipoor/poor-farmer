@@ -127,10 +127,13 @@ public final class GameActivity extends Activity {
       return textures;
     });
     jobs.submit(() -> {
-      game.setBootAssets(new BootAssets(
-          terrainHolder[0], meshHolder[0], textures[0], textures[1], textures[2]));
       loading.completeUnits(1);
-      return null;
+      return new BootAssets(
+          terrainHolder[0], meshHolder[0], textures[0], textures[1], textures[2]);
+    }, result -> {
+      BootAssets assets = (BootAssets) result;
+      game.setBootAssets(assets);
+      gameView.sceneRenderer().setTerrain(assets.terrainMesh);
     });
   }
 }

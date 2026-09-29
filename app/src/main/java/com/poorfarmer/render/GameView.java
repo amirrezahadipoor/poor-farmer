@@ -23,13 +23,16 @@ public final class GameView extends GLSurfaceView {
 
   private final Game game;
   private final FixedTimestepLoop loop = new FixedTimestepLoop();
-  private final SolidColorRenderer renderer = new SolidColorRenderer();
+  private final SceneRenderer sceneRenderer = new SceneRenderer();
   private final PostProcessor postProcessor = new PostProcessor();
   private final GameCamera camera = new GameCamera(Terrain.WORLD_HALF);
   private final TouchController touchController;
   private final FpsMeter fpsMeter = new FpsMeter(120);
   private final LoopRenderer glRenderer = new LoopRenderer();
   private long lastFrameNanos;
+  private SunState sunCache;
+  private int sunMinute = -1;
+  private int sunSeason = -1;
 
   public GameView(Context context, Game game) {
     super(context);
@@ -44,6 +47,10 @@ public final class GameView extends GLSurfaceView {
     return fpsMeter;
   }
 
+  public SceneRenderer sceneRenderer() {
+    return sceneRenderer;
+  }
+
   @Override
   public boolean onTouchEvent(MotionEvent event) {
     return touchController.onTouchEvent(event);
@@ -54,13 +61,16 @@ public final class GameView extends GLSurfaceView {
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
       lastFrameNanos = 0L;
-      renderer.onSurfaceCreated(gl, config);
+      sceneRenderer.onSurfaceCreated(gl, config);
       postProcessor.onSurfaceCreated(gl, config);
+      sunCache = null;
+      sunMinute = -1;
+      sunSeason = -1;
     }
 
     @Override
     public void onSurfaceChanged(GL10 gl, int width, int height) {
-      renderer.onSurfaceChanged(gl, width, height);
+      sceneRenderer.onSurfaceChanged(gl, width, height);
       postProcessor.onSurfaceChanged(gl, width, height);
       touchController.setScreenSize(width, height);
     }
@@ -74,20 +84,33 @@ public final class GameView extends GLSurfaceView {
       fpsMeter.addFrame(frameSeconds);
       game.jobs().pollCallbacks();
       camera.update(frameSeconds);
+      SunState sun = sunForCurrentClock();
       postProcessor.beginScene();
-      renderer.onDrawFrame(gl, loop.interpolationAlpha());
+      sceneRenderer.draw(camera, sun);
       postProcessor.endScene();
-      float hour = game.time().clockMinute() / 60f;
-      SunState sun = new SunState(hour, game.time().season());
       PostProcessParams params = PostProcessParams.resolve(
           game.time().season(), sun.elevationDegrees(), sun.sunIntensity());
       postProcessor.composite(QUALITY, params);
     }
   }
 
+  private SunState sunForCurrentClock() {
+    int minute = game.time().clockMinute();
+    int season = game.time().season();
+    if (sunCache == null || minute != sunMinute || season != sunSeason) {
+      sunCache = new SunState(minute / 60f, season);
+      sunMinute = minute;
+      sunSeason = season;
+    }
+    return sunCache;
+  }
+
   @Override
   public void surfaceDestroyed(android.view.SurfaceHolder holder) {
     super.surfaceDestroyed(holder);
-    queueEvent(postProcessor::close);
+    queueEvent(() -> {
+      sceneRenderer.close();
+      postProcessor.close();
+    });
   }
 }

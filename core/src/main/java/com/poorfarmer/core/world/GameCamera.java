@@ -17,6 +17,8 @@ public final class GameCamera {
 
   private final float worldHalf;
   private final float pitch = (float) Math.toRadians(PITCH_DEG);
+  private final Vec3 eyeScratch = new Vec3();
+  private final Vec3 lookScratch = new Vec3();
 
   private Vec2 center = new Vec2(0f, 0f);
   private Vec2 targetCenter = new Vec2(0f, 0f);
@@ -117,13 +119,23 @@ public final class GameCamera {
   }
 
   public Mat4 viewMatrix() {
-    Vec3 eye = eyePosition();
-    Vec3 look = new Vec3(center.x, 0f, center.y);
-    return new Mat4().lookAt(eye, look, Vec3.UP);
+    return new Mat4().lookAt(eyePosition(), new Vec3(center.x, 0f, center.y), Vec3.UP);
+  }
+
+  public void fillView(Mat4 out) {
+    float horiz = zoom * (float) Math.cos(pitch);
+    float vert = zoom * (float) Math.sin(pitch);
+    eyeScratch.set(center.x + (float) Math.sin(yaw) * horiz, vert, center.y + (float) Math.cos(yaw) * horiz);
+    lookScratch.set(center.x, 0f, center.y);
+    out.lookAt(eyeScratch, lookScratch, Vec3.UP);
   }
 
   public Mat4 projectionMatrix(float aspect) {
     return new Mat4().perspective((float) Math.toRadians(FOV_DEG), aspect, NEAR, FAR);
+  }
+
+  public void fillProjection(Mat4 out, float aspect) {
+    out.perspective((float) Math.toRadians(FOV_DEG), aspect, NEAR, FAR);
   }
 
   public Vec4 screenFromWorld(Mat4 proj, Vec3 world, float screenW, float screenH) {
