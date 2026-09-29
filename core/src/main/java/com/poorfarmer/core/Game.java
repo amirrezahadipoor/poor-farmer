@@ -12,7 +12,7 @@ public final class Game {
   private final GameTime time = new GameTime();
   private final ScreenMachine screens = new ScreenMachine();
   private final FarmGrid farm = new FarmGrid();
-  private final LoadingProgress loading = new LoadingProgress("در حال بارگذاری", 4);
+  private final LoadingProgress loading = new LoadingProgress("در حال بارگذاری", 5);
   private JobQueue jobs;
   private BootAssets bootAssets;
   private SunState sun;

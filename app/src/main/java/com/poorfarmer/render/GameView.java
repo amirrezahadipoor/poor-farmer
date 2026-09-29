@@ -83,7 +83,7 @@ public final class GameView extends GLSurfaceView {
         sun = new SunState(9f, 0);
       }
       postProcessor.beginScene();
-      sceneRenderer.draw(camera, sun, game.farm());
+      sceneRenderer.draw(camera, sun, game.farm(), (float) (System.nanoTime() / 1e9));
       postProcessor.endScene();
       PostProcessParams params = PostProcessParams.resolve(
           game.time().season(), sun.elevationDegrees(), sun.sunIntensity());

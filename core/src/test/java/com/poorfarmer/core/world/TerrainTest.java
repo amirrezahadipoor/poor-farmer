@@ -38,7 +38,8 @@ public class TerrainTest {
     for (float x = -25f; x <= 25f; x += 5f) {
       for (float z = -25f; z <= 25f; z += 5f) {
         float h = terrain.heightAt(x, z);
-        assertEquals(Terrain.FARM_MAX_HEIGHT, h, 0.001f);
+        float expected = Terrain.FARM_MAX_HEIGHT - River.bedDepthAt(x, z);
+        assertEquals("at " + x + "," + z, expected, h, 0.001f);
       }
     }
   }

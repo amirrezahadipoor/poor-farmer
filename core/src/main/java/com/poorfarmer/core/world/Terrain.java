@@ -75,6 +75,7 @@ public final class Terrain {
     float dist = (float) Math.sqrt(x * x + z * z);
     float flatten = 1f - smoothstep(FARM_FLAT_RADIUS, FARM_FLATTEN_RADIUS, dist);
     height = height * (1f - flatten) + FARM_MAX_HEIGHT * flatten;
+    height -= River.bedDepthAt(x, z);
     return height;
   }
 

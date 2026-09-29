@@ -118,6 +118,12 @@ public final class GameCamera {
         center.y + (float) Math.cos(yaw) * horiz);
   }
 
+  public void fillEye(Vec3 out) {
+    float horiz = zoom * (float) Math.cos(pitch);
+    float vert = zoom * (float) Math.sin(pitch);
+    out.set(center.x + (float) Math.sin(yaw) * horiz, vert, center.y + (float) Math.cos(yaw) * horiz);
+  }
+
   public Mat4 viewMatrix() {
     return new Mat4().lookAt(eyePosition(), new Vec3(center.x, 0f, center.y), Vec3.UP);
   }

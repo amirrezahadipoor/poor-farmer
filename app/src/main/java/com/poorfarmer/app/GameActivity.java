@@ -19,6 +19,7 @@ import com.poorfarmer.core.profiler.JvmMemoryProbe;
 import com.poorfarmer.core.save.AtomicFileStore;
 import com.poorfarmer.core.save.SessionState;
 import com.poorfarmer.core.world.BootAssets;
+import com.poorfarmer.core.world.River;
 import com.poorfarmer.core.world.Terrain;
 import com.poorfarmer.render.DebugHudView;
 import com.poorfarmer.render.GameView;
@@ -103,10 +104,11 @@ public final class GameActivity extends Activity {
 
   private void startBoot() {
     LoadingProgress loading = game.loading();
-    loading.reset(4);
+    loading.reset(5);
     JobQueue jobs = game.jobs();
     Terrain[] terrainHolder = new Terrain[1];
     MeshGeometry[] meshHolder = new MeshGeometry[1];
+    MeshGeometry[] riverMeshHolder = new MeshGeometry[1];
     Texture[] textures = new Texture[3];
     jobs.submit(() -> {
       terrainHolder[0] = new Terrain(BOOT_SEED);
@@ -115,6 +117,7 @@ public final class GameActivity extends Activity {
     });
     jobs.submit(() -> {
       meshHolder[0] = terrainHolder[0].toMesh(TERRAIN_MESH_STEP);
+      riverMeshHolder[0] = new River().toMesh(terrainHolder[0], TERRAIN_MESH_STEP);
       loading.completeUnits(1);
       return meshHolder[0];
     });
@@ -129,11 +132,13 @@ public final class GameActivity extends Activity {
     jobs.submit(() -> {
       loading.completeUnits(1);
       return new BootAssets(
-          terrainHolder[0], meshHolder[0], textures[0], textures[1], textures[2]);
+          terrainHolder[0], meshHolder[0], riverMeshHolder[0],
+          textures[0], textures[1], textures[2]);
     }, result -> {
       BootAssets assets = (BootAssets) result;
       game.setBootAssets(assets);
       gameView.sceneRenderer().setTerrain(assets.terrainMesh);
+      gameView.sceneRenderer().setRiver(assets.riverMesh);
     });
   }
 }
