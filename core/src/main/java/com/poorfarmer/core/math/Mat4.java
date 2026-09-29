@@ -24,12 +24,15 @@ public final class Mat4 {
     return this;
   }
 
+  private static final ThreadLocal<float[]> ALIAS_TEMPORARY =
+      ThreadLocal.withInitial(() -> new float[16]);
+
   public static void multiply(Mat4 a, Mat4 b, Mat4 out) {
     float[] r = out.data;
     float[] sa = a.data;
     float[] sb = b.data;
     if (out == a || out == b) {
-      float[] tmp = new float[16];
+      float[] tmp = ALIAS_TEMPORARY.get();
       for (int col = 0; col < 4; col++) {
         for (int row = 0; row < 4; row++) {
           tmp[col * 4 + row] =

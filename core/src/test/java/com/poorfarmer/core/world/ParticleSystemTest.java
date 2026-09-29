@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import com.poorfarmer.core.AllocationProbe;
 import org.junit.Test;
 
 public class ParticleSystemTest {
@@ -143,5 +144,14 @@ public class ParticleSystemTest {
     assertEquals(0, ps.activeCount());
     ps.emit(ParticleType.SMOKE, 0f, 0f, 0f, 20, 0);
     assertEquals(20, ps.activeCount());
+  }
+
+  @Test
+  public void updateWithFullPoolDoesNotAllocate() {
+    ParticleSystem ps = new ParticleSystem(4096, 11L);
+    while (ps.emit(ParticleType.DUST, 0f, 0f, 0f, 64, 0)) {
+    }
+    assertTrue(ps.activeCount() >= 4000);
+    AllocationProbe.assertStable(() -> ps.update(1f / 60f), 300, 3000, 256 * 1024L);
   }
 }

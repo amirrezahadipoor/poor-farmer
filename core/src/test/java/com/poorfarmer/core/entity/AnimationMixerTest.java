@@ -3,6 +3,7 @@ package com.poorfarmer.core.entity;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import com.poorfarmer.core.AllocationProbe;
 import com.poorfarmer.core.math.Quat;
 import com.poorfarmer.core.math.Vec3;
 import org.junit.Test;
@@ -96,5 +97,27 @@ public class AnimationMixerTest {
     mixer.play(down);
     mixer.update(0.05f);
     assertEquals(-1f, skeleton.bone(1).localPosition.y, 0.05f);
+  }
+
+  @Test
+  public void updateDoesNotAllocate() {
+    Skeleton skeleton = new Skeleton();
+    skeleton.addBone("root", -1, new Vec3(), new Quat().identity());
+    skeleton.addBone("arm", 0, new Vec3(0.5f, 0f, 0f), new Quat().identity());
+    skeleton.addBone("hand", 1, new Vec3(0.4f, 0f, 0f), new Quat().identity());
+    AnimationClip walk = AnimationClip
+        .builder("walk", 1f, true, 3)
+        .key(0f, 1, new Vec3(0.5f, 0f, 0f), new Quat().identity())
+        .key(0.5f, 1, new Vec3(0.5f, 1f, 0f), new Quat().identity())
+        .key(1f, 1, new Vec3(0.5f, 0f, 0f), new Quat().identity())
+        .key(0f, 2, new Vec3(0.4f, 0f, 0f), new Quat().identity())
+        .key(0.5f, 2, new Vec3(0.4f, -1f, 0f), new Quat().identity())
+        .key(1f, 2, new Vec3(0.4f, 0f, 0f), new Quat().identity())
+        .build();
+    AnimationClip idle = staticClip("idle", 0.2f);
+    AnimationMixer mixer = new AnimationMixer(skeleton);
+    mixer.play(walk);
+    mixer.crossFade(idle, 0.5f);
+    AllocationProbe.assertStable(() -> mixer.update(1f / 60f), 200, 3000, 256 * 1024L);
   }
 }

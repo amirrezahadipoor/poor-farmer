@@ -64,16 +64,14 @@ public final class Skeleton {
       scaleScratch.data[0] = bone.localScale.x;
       scaleScratch.data[5] = bone.localScale.y;
       scaleScratch.data[10] = bone.localScale.z;
-      localScratch.copyOf(rotationScratch);
-      localScratch.multiply(scaleScratch);
+      Mat4.multiply(rotationScratch, scaleScratch, localScratch);
       localScratch.data[12] = bone.localPosition.x;
       localScratch.data[13] = bone.localPosition.y;
       localScratch.data[14] = bone.localPosition.z;
       if (bone.parent < 0) {
         bone.worldMatrix.copyOf(localScratch);
       } else {
-        bone.worldMatrix.copyOf(bones.get(bone.parent).worldMatrix);
-        bone.worldMatrix.multiply(localScratch);
+        Mat4.multiply(bones.get(bone.parent).worldMatrix, localScratch, bone.worldMatrix);
       }
     }
   }
