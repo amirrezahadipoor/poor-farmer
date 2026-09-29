@@ -14,6 +14,7 @@ import com.poorfarmer.core.world.PostProcessParams;
 import com.poorfarmer.core.world.SkyPalette;
 import com.poorfarmer.core.world.SunState;
 import com.poorfarmer.core.world.Terrain;
+import com.poorfarmer.core.world.WorldLocation;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -27,6 +28,7 @@ public final class GameView extends GLSurfaceView {
   private final SceneRenderer sceneRenderer = new SceneRenderer();
   private final PostProcessor postProcessor = new PostProcessor();
   private final GameCamera camera = new GameCamera(Terrain.WORLD_HALF);
+  private WorldLocation lastLocation = WorldLocation.FARM;
   private final TouchController touchController;
   private final FpsMeter fpsMeter = new FpsMeter(120);
   private final LoopRenderer glRenderer = new LoopRenderer();
@@ -79,6 +81,11 @@ public final class GameView extends GLSurfaceView {
       loop.accumulateAndStep(frameSeconds, game::tick);
       fpsMeter.addFrame(frameSeconds);
       game.jobs().pollCallbacks();
+      WorldLocation location = game.travel().current();
+      if (location != lastLocation) {
+        lastLocation = location;
+        camera.setCenter(location.focusX(), location.focusZ());
+      }
       camera.update(frameSeconds);
       SunState sun = game.sunState();
       SkyPalette palette = game.skyPalette();

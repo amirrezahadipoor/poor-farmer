@@ -60,6 +60,25 @@ public final class GameEvents {
     }
   }
 
+  public static final class TravelStarted {
+    public final com.poorfarmer.core.world.WorldLocation from;
+    public final com.poorfarmer.core.world.WorldLocation to;
+
+    public TravelStarted(com.poorfarmer.core.world.WorldLocation from,
+                         com.poorfarmer.core.world.WorldLocation to) {
+      this.from = from;
+      this.to = to;
+    }
+  }
+
+  public static final class TravelArrived {
+    public final com.poorfarmer.core.world.WorldLocation location;
+
+    public TravelArrived(com.poorfarmer.core.world.WorldLocation location) {
+      this.location = location;
+    }
+  }
+
   private GameEvents() {
   }
 }

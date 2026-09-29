@@ -15,6 +15,7 @@ public final class Game {
   private final ScreenMachine screens = new ScreenMachine();
   private final FarmGrid farm = new FarmGrid();
   private final GrandfatherHouse house = new GrandfatherHouse();
+  private final com.poorfarmer.core.world.TravelState travel = new com.poorfarmer.core.world.TravelState(bus);
   private boolean houseInterior;
   private final LoadingProgress loading = new LoadingProgress("در حال بارگذاری", 4);
   private JobQueue jobs;
@@ -43,6 +44,10 @@ public final class Game {
 
   public FarmGrid farm() {
     return farm;
+  }
+
+  public com.poorfarmer.core.world.TravelState travel() {
+    return travel;
   }
 
   public GrandfatherHouse house() {
@@ -118,6 +123,7 @@ public final class Game {
       sunSeason = season;
     }
     farm.update(realSeconds, season, sun.sunIntensity());
+    travel.update(realSeconds);
     ScreenHandler handler = screens.currentHandler();
     if (handler != null) {
       handler.update(realSeconds);
