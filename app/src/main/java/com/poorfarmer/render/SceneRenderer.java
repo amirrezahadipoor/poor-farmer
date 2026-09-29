@@ -222,6 +222,7 @@ public final class SceneRenderer implements AutoCloseable {
   private Mesh farmOverlay;
   private Mesh river;
   private Mesh mountains;
+  private Mesh buildings;
   private GrandfatherHouse house;
   private Mesh houseMesh;
   private Mesh houseInteriorMesh;
@@ -294,6 +295,13 @@ public final class SceneRenderer implements AutoCloseable {
     house = grandfatherHouse;
   }
 
+  public void setBuildings(MeshGeometry geometry) {
+    if (buildings != null) {
+      buildings.close();
+    }
+    buildings = Mesh.upload(geometry);
+  }
+
   public void setTerrain(MeshGeometry geometry) {
     if (terrain != null) {
       terrain.close();
@@ -343,6 +351,9 @@ public final class SceneRenderer implements AutoCloseable {
       mountains.draw();
     }
     terrain.draw();
+    if (buildings != null) {
+      buildings.draw();
+    }
     if (houseInteriorMesh != null && houseInterior) {
       houseInteriorMesh.draw();
     } else if (houseMesh != null) {
@@ -493,6 +504,10 @@ public final class SceneRenderer implements AutoCloseable {
     if (mountains != null) {
       mountains.close();
       mountains = null;
+    }
+    if (buildings != null) {
+      buildings.close();
+      buildings = null;
     }
     if (houseMesh != null) {
       houseMesh.close();

@@ -16,7 +16,7 @@ public final class Game {
   private final FarmGrid farm = new FarmGrid();
   private final GrandfatherHouse house = new GrandfatherHouse();
   private boolean houseInterior;
-  private final LoadingProgress loading = new LoadingProgress("در حال بارگذاری", 5);
+  private final LoadingProgress loading = new LoadingProgress("در حال بارگذاری", 4);
   private JobQueue jobs;
   private BootAssets bootAssets;
   private SunState sun;
