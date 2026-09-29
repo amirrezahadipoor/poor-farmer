@@ -8,6 +8,7 @@ import com.poorfarmer.app.TouchController;
 import com.poorfarmer.core.FixedTimestepLoop;
 import com.poorfarmer.core.Game;
 import com.poorfarmer.core.Quality;
+import com.poorfarmer.core.profiler.FpsMeter;
 import com.poorfarmer.core.world.GameCamera;
 import com.poorfarmer.core.world.PostProcessParams;
 import com.poorfarmer.core.world.SunState;
@@ -26,6 +27,7 @@ public final class GameView extends GLSurfaceView {
   private final PostProcessor postProcessor = new PostProcessor();
   private final GameCamera camera = new GameCamera(Terrain.WORLD_HALF);
   private final TouchController touchController;
+  private final FpsMeter fpsMeter = new FpsMeter(120);
   private final LoopRenderer glRenderer = new LoopRenderer();
   private long lastFrameNanos;
 
@@ -36,6 +38,10 @@ public final class GameView extends GLSurfaceView {
     setEGLContextClientVersion(3);
     setRenderer(glRenderer);
     setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
+  }
+
+  public FpsMeter fpsMeter() {
+    return fpsMeter;
   }
 
   @Override
@@ -65,6 +71,7 @@ public final class GameView extends GLSurfaceView {
       float frameSeconds = lastFrameNanos == 0L ? 0f : (nowNanos - lastFrameNanos) / 1_000_000_000f;
       lastFrameNanos = nowNanos;
       loop.accumulateAndStep(frameSeconds, game::tick);
+      fpsMeter.addFrame(frameSeconds);
       game.jobs().pollCallbacks();
       camera.update(frameSeconds);
       postProcessor.beginScene();
