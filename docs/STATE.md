@@ -4,11 +4,11 @@
 
 ## آخرین مورد انجام‌شده
 
-- [x] 1.06 تولید تکسچر پروسیجرال: noise، خاک، چمن، سنگ، چوب، پارچه، آب، آسمان، رنگ‌آمیزی
+- [x] 1.11 frustum culling و chunk بندی جهان
 
 ## مورد بعدی
 
-- [ ] 1.07 دوربین ۲.۵بعدی با pan، pinch-zoom، چرخش ۹۰درجه‌ای و محدودیت‌ها
+- [ ] 2.01 زمین heightmap با noise، شیب ملایم دره‌ی کوهپایه‌ای، رنگ‌آمیزی ارتفاعی
 
 ## خلاصه‌ی جلسات
 
@@ -22,7 +22,7 @@
 - Milestone و Label و Issue برای ۱۳ فاز (Milestone 1-13، Issue #1-#13).
 - پایه‌ی منطق در `:core`: `Game`، `GameScreen` (۲۷ صفحه)، `ScreenMachine`، `ScreenHandler`، `GameTime` (روز ۴۸۰ ثانیه‌ای، ۱۴ روز فصول، ۵۶ روز سال)، `EventBus`، `GameEvents`.
 
-### نشست ۲ (فاز ۱ — 1.01 تا 1.06 کامل)
+### نشست ۲ (فاز ۱ کامل — 1.01 تا 1.11)
 
 - حلقه‌ی timestep ثابت: `FixedTimestepLoop` (قدم ۱/۶۰ ثانیه، clamp ۰.۲۵، بازگرداندن alpha برای درون‌یابی) + `FixedStepConsumer`.
 - کتابخانه‌ی ریاضی در `com.poorfarmer.core.math`: `Vec2/Vec3/Vec4`، `Mat4` (identity/translate/scale/rotate/lookAt/perspective/multiply/invert بر پایه‌ی minor/cofactor)، `Quat` (axis-angle، slerp، rotation matrix)؛ قرارداد float[16] ستون‌اول، rotationY(π/2): +X→(0,0,−1).
@@ -38,13 +38,16 @@
 ## تصمیم‌های مهم این نشست
 
 - D13 تکمیل شد با پیاده‌سازی واقعی (Vec/Mat4/Quat).
-- D17: کلاس‌های GL (Mesh، TextureGL، ShaderProgram) با بیلد + lint تأیید شدند؛ تأیید بصری با capture فاز ۱۱.
+- D17: کلاس‌های GL (Mesh، TextureGL، ShaderProgram، InstancedMesh، ShadowBlobRenderer) با بیلد + lint تأیید شدند؛ تأیید بصری با capture فاز ۱۱.
 - D18: قرارداد هندسه/بافت ثبت شد (شمارش used جدا از capacity، winding CCW رو به بیرون، پروفایل lathe بالا→پایین، determinism بافت‌ها، امضای glGen*).
+- D19: دستورات لمس دوربین (pan/پینچ/چرخش) ثبت شد.
+- D20: انتخاب blob shadow با سه سطح کیفیت (به‌جای shadow map) ثبت شد.
+- نکته‌ی مهم: شماره‌ی آیتم‌ها دقیقاً مطابق ROADMAP است (1.07 دوربین، 1.08 نور، 1.09 سایه، 1.10 instancing، 1.11 culling/chunk) — در نشست قبل یک‌بار اشتباه 1.07 را به shader نسبت دادم و با کامیت اصلاح‌ساز درست شد.
 
 ## دستور شروع نشست بعدی
 
 1. این فایل و `ROADMAP.md` را بخوان.
-2. از اولین مورد بی‌تیک (`1.07` — دوربین) شروع کن.
+2. از اولین مورد بی‌تیک (`2.01`) شروع کن.
 3. هر مورد: پیاده‌سازی، تأیید (بیلد/تست/اجرا)، تیک در ROADMAP، کامیت با قالب `<شناسه>: <شرح>`، پوش فوری.
 4. زنجیره‌ی بیلد محلی: `JAVA_HOME=/home/user/.cache/tl/jdk-17.0.20.1+1 ANDROID_HOME=/home/user/.cache/android-sdk ./gradlew :core:test :app:build` (اگر جداول نبودند: Temurin 17 از api.adoptium.net، gradle-8.14.5-bin.zip، commandlinetools-linux-11076708.zip + `sdkmanager "platforms;android-36" "build-tools;36.0.0"`).
 5. Issue #1 (فاز ۰) بسته شد؛ Issue هر فاز را با `Closes #N` در کامیت پایان همان فاز ببند.
