@@ -3,6 +3,8 @@ package com.poorfarmer.core;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.junit.Test;
 
 public final class GameTimeTest {
@@ -60,6 +62,22 @@ public final class GameTimeTest {
     GameTime time = new GameTime();
     time.setSpeed(0);
     time.setSpeed(3);
+    assertEquals(1, time.speed());
+  }
+
+  @Test
+  public void speedChangedEventOnlyOnActualChange() {
+    EventBus bus = new EventBus();
+    GameTime time = new GameTime();
+    time.bind(bus);
+    List<Integer> changes = new ArrayList<>();
+    bus.subscribe(GameEvents.SpeedChanged.class, event -> changes.add(event.speed));
+    time.setSpeed(2);
+    assertEquals(List.of(2), changes);
+    time.setSpeed(2);
+    assertEquals(List.of(2), changes);
+    time.setSpeed(1);
+    assertEquals(List.of(2, 1), changes);
     assertEquals(1, time.speed());
   }
 

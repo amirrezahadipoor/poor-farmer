@@ -24,8 +24,11 @@ public final class GameTime {
   }
 
   public void setSpeed(int newSpeed) {
-    if (newSpeed >= 1 && newSpeed <= 2) {
+    if (newSpeed >= 1 && newSpeed <= 2 && newSpeed != speed) {
       speed = newSpeed;
+      if (events != null) {
+        events.publish(new GameEvents.SpeedChanged(newSpeed));
+      }
     }
   }
 
