@@ -282,6 +282,29 @@ public final class MeshBuilder {
     }
   }
 
+  public static MeshGeometry disc(float radius, int segments) {
+    MeshGeometry g = new MeshGeometry();
+    int center = g.vertexCount();
+    g.appendVertex(0f, 0f, 0f, 0f, 1f, 0f, 0.5f, 0.5f);
+    for (int i = 0; i < segments; i++) {
+      float angle = (float) (2 * Math.PI * i / segments);
+      g.appendVertex(
+          (float) Math.cos(angle) * radius,
+          0f,
+          (float) Math.sin(angle) * radius,
+          0f, 1f, 0f,
+          0.5f + 0.5f * (float) Math.cos(angle),
+          0.5f + 0.5f * (float) Math.sin(angle));
+    }
+    for (int i = 0; i < segments; i++) {
+      g.appendIndex(center);
+      g.appendIndex(center + 1 + ((i + 1) % segments));
+      g.appendIndex(center + 1 + i);
+    }
+    g.trimToUsed();
+    return g;
+  }
+
   public static MeshGeometry merge(MeshGeometry[] parts) {
     MeshGeometry result = new MeshGeometry();
     for (MeshGeometry part : parts) {
