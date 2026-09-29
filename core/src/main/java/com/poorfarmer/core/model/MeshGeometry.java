@@ -8,6 +8,7 @@ public final class MeshGeometry {
   public float[] positions = new float[0];
   public float[] normals = new float[0];
   public float[] uvs = new float[0];
+  public float[] colors = new float[0];
   public int[] indices = new int[0];
   private int usedVertexCount;
   private int usedIndexCount;
@@ -118,10 +119,28 @@ public final class MeshGeometry {
     usedIndexCount++;
   }
 
+  public boolean hasColors() {
+    return colors.length >= usedVertexCount * 4;
+  }
+
+  public void setVertexColor(int vertex, float r, float g, float b, float a) {
+    if (colors.length < (usedVertexCount + 1) * 4) {
+      colors = growFloat(colors, (usedVertexCount + 1) * 4);
+    }
+    int base = vertex * 4;
+    colors[base] = r;
+    colors[base + 1] = g;
+    colors[base + 2] = b;
+    colors[base + 3] = a;
+  }
+
   public void trimToUsed() {
     positions = java.util.Arrays.copyOf(positions, usedVertexCount * 3);
     normals = java.util.Arrays.copyOf(normals, usedVertexCount * 3);
     uvs = java.util.Arrays.copyOf(uvs, usedVertexCount * 2);
+    if (colors.length > 0) {
+      colors = java.util.Arrays.copyOf(colors, usedVertexCount * 4);
+    }
     indices = java.util.Arrays.copyOf(indices, usedIndexCount);
   }
 
@@ -134,6 +153,10 @@ public final class MeshGeometry {
     System.arraycopy(part.positions, 0, positions, offset * 3, part.usedVertexCount * 3);
     System.arraycopy(part.normals, 0, normals, offset * 3, part.usedVertexCount * 3);
     System.arraycopy(part.uvs, 0, uvs, offset * 2, part.usedVertexCount * 2);
+    if (part.colors.length > 0) {
+      colors = growFloat(colors, (offset + part.usedVertexCount) * 4);
+      System.arraycopy(part.colors, 0, colors, offset * 4, part.colors.length);
+    }
     for (int i = 0; i < part.usedIndexCount; i++) {
       indices[usedIndexCount + i] = part.indices[i] + offset;
     }
