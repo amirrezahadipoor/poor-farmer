@@ -84,7 +84,7 @@
 ### فاز ۱ — موتور
 
 - [x] 1.01 حلقه‌ی بازی با timestep ثابت و رندر interpolated
-- [ ] 1.02 ShaderProgram و کامپایل shader با گزارش خطا
+- [x] 1.02 ShaderProgram و کامپایل shader با گزارش خطا
 - [ ] 1.03 ماتریس، بردار، کواترنیون و ابزار ریاضی سبک
 - [ ] 1.04 MeshBuilder با primitiveهای box، cylinder، cone، sphere، lathe، extrude و ترکیب‌کننده
 - [ ] 1.05 Mesh با VBO/VAO و رنگ راس، normal و UV
