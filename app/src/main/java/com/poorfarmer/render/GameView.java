@@ -2,12 +2,16 @@ package com.poorfarmer.render;
 
 import android.content.Context;
 import android.opengl.GLSurfaceView;
+import android.view.MotionEvent;
 
+import com.poorfarmer.app.TouchController;
 import com.poorfarmer.core.FixedTimestepLoop;
 import com.poorfarmer.core.Game;
 import com.poorfarmer.core.Quality;
+import com.poorfarmer.core.world.GameCamera;
 import com.poorfarmer.core.world.PostProcessParams;
 import com.poorfarmer.core.world.SunState;
+import com.poorfarmer.core.world.Terrain;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -20,15 +24,23 @@ public final class GameView extends GLSurfaceView {
   private final FixedTimestepLoop loop = new FixedTimestepLoop();
   private final SolidColorRenderer renderer = new SolidColorRenderer();
   private final PostProcessor postProcessor = new PostProcessor();
+  private final GameCamera camera = new GameCamera(Terrain.WORLD_HALF);
+  private final TouchController touchController;
   private final LoopRenderer glRenderer = new LoopRenderer();
   private long lastFrameNanos;
 
   public GameView(Context context, Game game) {
     super(context);
     this.game = game;
+    this.touchController = new TouchController(camera, game.bus());
     setEGLContextClientVersion(3);
     setRenderer(glRenderer);
     setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
+  }
+
+  @Override
+  public boolean onTouchEvent(MotionEvent event) {
+    return touchController.onTouchEvent(event);
   }
 
   private final class LoopRenderer implements GLSurfaceView.Renderer {
@@ -44,6 +56,7 @@ public final class GameView extends GLSurfaceView {
     public void onSurfaceChanged(GL10 gl, int width, int height) {
       renderer.onSurfaceChanged(gl, width, height);
       postProcessor.onSurfaceChanged(gl, width, height);
+      touchController.setScreenSize(width, height);
     }
 
     @Override
@@ -52,6 +65,7 @@ public final class GameView extends GLSurfaceView {
       float frameSeconds = lastFrameNanos == 0L ? 0f : (nowNanos - lastFrameNanos) / 1_000_000_000f;
       lastFrameNanos = nowNanos;
       loop.accumulateAndStep(frameSeconds, game::tick);
+      camera.update(frameSeconds);
       postProcessor.beginScene();
       renderer.onDrawFrame(gl, loop.interpolationAlpha());
       postProcessor.endScene();

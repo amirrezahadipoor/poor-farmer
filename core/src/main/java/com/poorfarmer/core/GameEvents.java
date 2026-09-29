@@ -40,6 +40,26 @@ public final class GameEvents {
     }
   }
 
+  public static final class Tapped {
+    public final float x;
+    public final float z;
+
+    public Tapped(float x, float z) {
+      this.x = x;
+      this.z = z;
+    }
+  }
+
+  public static final class LongPressed {
+    public final float x;
+    public final float z;
+
+    public LongPressed(float x, float z) {
+      this.x = x;
+      this.z = z;
+    }
+  }
+
   private GameEvents() {
   }
 }
